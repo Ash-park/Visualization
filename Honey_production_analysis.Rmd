@@ -1,0 +1,248 @@
+---
+title: "**Honey Production Analysis**"
+author: "**Ashish Bisht**"
+date: "**2023-09-30**"
+output: pdf_document
+---
+
+```{=tex}
+\begin{centering}
+\large
+Roll No: MDS202313
+
+\large
+DG1107: Visualization
+
+\large
+Email: \href{mailto:ashishb.mds2023@cmi.ac.in}{ashishb.mds2023@cmi.ac.in}
+
+\end{centering}
+```
+
+
+
+```{r setup, include= FALSE, echo = FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+\newpage
+
+# Introduction
+
+The agricultural industry plays a vital role in the economy of many regions and states across the United States. Understanding the dynamics of agricultural production is essential for effective policy-making and resource allocation. In this report, we will explore a dataset containing information about honey production in various states, with a focus on honey yields, production values, and related factors. The objective of this analysis is to gain insights into the trends and patterns in honey production and their implications for the honey industry.
+
+# Data Description
+
+The dataset used for this analysis contains the following variables:
+
+**state**:The state in which honey production data was recorded.
+
+**numcol**: The number of honey-producing colonies.
+
+**yieldpercol**: The yield per colony in pounds.
+
+**totalprod**: The total honey production in pounds.
+
+**stocks**: The stocks of honey in pounds.
+
+**priceperlb**: The price per pound of honey.
+
+**prodvalue**: The total production value in dollars.
+
+**year**: The year of data collection.
+
+**year_int**: A categorical variable representing arange of years.
+
+**region**: The region to which the state belongs.
+
+# **Objectives**
+
+* To determine the overall trend of the honey production in the USA.
+
+* Which states have the highest and lowest contribution to the total honey production.
+
+* What are the variations in number of honey producing colonies over time for each states in different regions.
+
+* To find distribution of yied per colony across diferent year intervals.
+
+* To determine the relationship among different given factor.
+
+# Exploratory Data Analysis
+
+## Total Honey Production over years
+
+```{r Barplot,warning= FALSE,message=FALSE, fig.height= 6, echo=FALSE}
+library(ggplot2)
+Honey_production= read.csv('C:/Users/Dell/OneDrive/Desktop/Visualization/Visualization/Honeyproduction.csv')
+
+ywtp <- aggregate(totalprod~year, data = Honey_production, sum)
+ggplot(ywtp, aes(y = totalprod, x = year)) +
+  geom_line(col = "#DF536B", size = 2) + 
+  geom_point(col = "#12a4d9", size = 4) + 
+  geom_hline(yintercept = 7800000 , linetype = 2, color = "grey40", size = 1) +
+  labs( x = "Year", y = "Total Production")+
+  coord_cartesian(ylim=c(50000000,250000000))+
+  theme_bw()
+
+```
+
+**Insights**
+
+-   As we can see declining lines in this line chart shows lower trend in production of honey over years.
+-   It's peak was at 1998 and 2000 with total production of 2bn (lbs) (approx) and at 2012 it has reached at total production of nearly 1.5bn (lbs).
+
+```{r Hbarplot,fig.height=6, echo= FALSE}
+ggplot(Honey_production, aes(x = totalprod, y = state , col = state )) +
+  geom_bar(stat = "identity" )+
+  theme_bw()+
+  theme(legend.position = "None")+
+  labs(title = "Honey Production among States", x = "Total Production", y = "State")
+ 
+```
+
+**Insights**
+
+-   North Dakota has the highest Honey production among all the states while South Carolina is having the lowest Honey production.
+-   Also that we can see slight lines cutting the bars in multiple sections showing production by year.
+
+# Honey Yield per Colony
+
+```{r Boxplot,warning= FALSE,message=FALSE,fig.height=6 , echo= FALSE}
+Honey_production$year=as.factor(Honey_production$year)
+ggplot(Honey_production, aes(y = yieldpercol,x = year, fill= year)) +
+  geom_boxplot() +
+  labs(x = "Year ", y = "Yield per Colony (lbs)") +
+  ggtitle("Boxplot of Yield per Colony by Year Interval")+
+  theme_bw()+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+-   These boxplots show the distribution of honey production across different year intervals.
+
+-   They help visualize the central tendency, spread, and potential outliers in honey production for each year interval, offering insights into production trends.
+
+# Honey Yield per Colony in different year intervals
+
+```{r density ,fig.height=7 , echo=FALSE}
+
+
+ggplot(data = Honey_production , aes(x=yieldpercol, fill = as.factor(year_int)))+
+  geom_density(alpha = 0.4)+
+  labs(x = "Yield per Colony (lbs) " ,fill = " Year intervals")
+```
+
+-   The density plot illustrates the distribution of yield per colony across different year intervals.
+
+-   It helps identify regions with varying yield per colony values and provides an overview of the data density and shape within each year interval.
+
+-   Also it shows yield per colony is increasing over year intervals.
+
+# Distribution of Colonies and Total Production
+```{r Piechart,fig.height= 3,fig.width=3, echo=FALSE}
+
+Region_total_production <- aggregate(totalprod ~ region, data = Honey_production, sum)
+
+ggplot(Region_total_production, aes(x = "", y = totalprod, fill = region))+
+  geom_bar(stat = "identity")+
+  coord_polar(theta = "y") +
+  labs(title = " Total Production Among Regions")+
+  theme_void()
+```
+```{r piechart2, ,fig.height= 3,fig.width=3,echo= FALSE}
+Region_total_colonies <- aggregate(numcol~ region, data = Honey_production, sum)
+
+ggplot(Region_total_colonies, aes(x = "", y = numcol, fill = region))+
+  geom_bar(stat = "identity")+
+  coord_polar(theta = "y") +
+  labs(title = "Colonies Distribution Among Regions")+
+  theme_void()
+
+```
+
+**Insights**
+
+-   The pie chart visually represents the proportion of honey-producing colonies and total honey production distributed among different regions.
+
+-   Also shows that Southwest region produces maximum of total honey production whereas NewEngland contributes lowest.
+
+```{r Histogram2,fig.height= 4, echo=FALSE}
+ggplot(Honey_production, aes(x = yieldpercol)) +
+  geom_histogram(binwidth = 5,col="white",fill="red",alpha=0.6) +
+  labs(title = "Distribution of Yield per Colony", x = "Yield per Colony", y = "Frequency")+
+  theme_test()
+
+```
+
+# Distribution of Yield per Colony among Regions
+
+```{r Histogram,fig.height= 7, echo=FALSE}
+ggplot(Honey_production, aes(x = yieldpercol,fill = region)) +
+  geom_histogram(binwidth = 5, position = "stack",col="black") +
+  labs(x = "Yield per Colony (lbs)", y = "Frequency") +
+  theme_test() +
+  theme(legend.position = 'None'  )+
+  scale_fill_brewer(palette = "Set3") +
+  facet_wrap(~region, ncol = 2)
+```
+**Insights**
+
+* These histogram visualizes the distribution of yield per colony within each region. It provides insights into the frequency of different yield per colony values in various regions.
+* We can clearly observe the South region is having the best yield per colony whereas NewEngland is merely having any yield.
+* Also we can see why our histogram of Yield percolony as a whole was right skewed because of histograms of south, west and southwest.
+
+\newpage
+
+# Trend of Honey-producing colonies over years.
+
+```{r Scatterplot,warning = FALSE, message= FALSE,fig.height=7,fig.width=7, echo = FALSE}
+ggplot(Honey_production, aes(size=yieldpercol,y=numcol,x=year,col=as.factor(region)))+
+  labs(x= ' Year' , y= 'No. of Colonies' , col = 'Region',size='Yield' )+
+  geom_point()+
+  scale_y_continuous(breaks= c(1e+04,3e+04,1e+05,3e+05),  labels = c("10k","30k","100k","300k"))+
+  theme_classic()+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  
+```
+**Insights**
+
+* This scatter plot reveals the trend in the number of honey-producing colonies in different regions over a period of time.
+* It also highlight growth or decline patterns and how they vary across regions.
+* Also we can see how which of regions are having a decline in the number of honey producing colonies.
+
+# Honey Yield per Colony vs. Honey Price per Pound
+
+```{r, echo = FALSE}
+
+ggplot(Honey_production, aes(x = priceperlb, y = prodvalue, color = as.factor(year_int) )) +
+  geom_point() +
+  theme_test()+
+  theme(legend.position=c(3,30000000))+
+  scale_y_log10(breaks= c(3e+05,1e+06,3e+06,1e+07,3e+07),  labels = c("300k","1m","3m","10m","30m"))+
+  labs(  x = "Price per Pound", y = "Production Value", color= " Year Intervals")
+  
+
+```
+**Insights**
+
+* The scatterplot above shows the relationship between honey yield per colony  and honey price per pound .
+* There appears to be a negative correlation, suggesting that as yield per colony increases, the price per pound tends to decrease.
+
+# Results
+
+**Declining Honey Production Trend**: The line chart reveals a declining trend in honey production over the years.
+
+**State-Level Variation**: North Dakota stands out as the state with the highest honey production among other states.
+
+**Yearly Patterns**: Shows that there are yearly patterns and fluctuations in honey production, contributing to the overall trend.
+
+**Yield per Colony Trends**: The density plot shows that the yield per colony is increasing over year intervals. This suggests that despite the overall decline in production, there may be improvements in colony yield, which could be a focus area for beekeepers.
+
+**Regional Contributions**: The pie chart illustrates the distribution of honey-producing colonies and total honey production among different regions. This regional distribution is crucial for understanding the geography of honey production.
+
+
+# Conclusion
+
+The findings from this analysis have significant implications for the honey industry. Understanding the factors that influence honey production, such as colony numbers, yield per colony, and market prices, is crucial for stakeholders, including beekeepers, policymakers, and consumers. The visualizations presented in this report provide insights into the dynamics of honey production, both at the state and regional levels, as well as over different years.
+
+Further analysis and exploration can help in making informed decisions and addressing challenges within the honey industry.
